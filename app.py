@@ -43,21 +43,56 @@ food_tab, transport_tab, waste_tab = st.tabs(
 
 with food_tab:
     st.subheader("Food Tracker")
-    st.write("Track your meals and explore sustainable alternatives.")
+    st.write(
+        "Log your meals and explore their estimated "
+        "environmental impact."
+        )
+    #data for development only
+    meals = {
+        "Beef burger": 3.0,
+        "Chicken wrap": 1.0,
+        "Vegetable pasta":0.5,
+        "Vegan curry": 0.4,
+        "Cheese pizza": 1.2
+    }
 
-    meal = st.selectbox(
-        "Choose a meal to explore:",
-        [
-            "Vegetable Pasta",
-            "Chicken Wrap",
-            "Beef Burger",
-            "Vegan Curry",
-            "Cheese Pizza"
-        ]
+    if "logged_meals" not in st.session_state:
+        st.session_state.logged_meals = []
+
+        #user can select a meal
+    selected_meal = st.selectbox(
+        "What did you eat?",
+        list(meals.keys())
     )
 
-    st.write(f"You selected: **{meal}**")
-    st.caption("Meal logging and impact calculations next...")
+    if st.button("Add Meal"):
+        meal_data = {
+            "name": selected_meal,
+            "emissions": meals[selected_meal]
+        }
+
+        st.session_state.logged_meals.append(meal_data)
+        st.success(f"{selected_meal} added to your food log!")
+
+    st.divider()
+
+    st.subheader("Today's Food Log")
+
+    if st.session_state.logged_meals:
+        total_emissions = sum(
+            meal["emissions"]
+            for meal in st.session_state.logged_meals
+        )
+
+        for meal in st.session_state.logged_meals:
+            st.write(
+                f"{meal['name']} - "
+                f"{meal['emissions']:.2f} kg CO2e"
+            )
+
+    else:
+        st.info("You haven't logged any meals yet.")
+
 
 with transport_tab:
     st.subheader("Transport Tracker")
